@@ -1,9 +1,36 @@
 import asyncio
 import math
+import os
 from array import array
 
 from baileys.foundation.node_runtime import JSError, JSObject
-from baileys.voip.shim.core import createNoopLogger
+
+WASM_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wasm', 'libopus.wasm')
+WASM_PAGE_SIZE = 65536
+
+WASM_EXPORT_NAMES = {
+    '_oc_create_encoder': 'i',
+    '_oc_destroy_encoder': 'j',
+    '_oc_encode': 'k',
+    '_oc_encode_float': 'l',
+    '_oc_encoder_ctl': 'm',
+    '_oc_encoder_ctl_get_bitrate': 'n',
+    '_oc_encoder_ctl_get_lookahead': 'o',
+    '_oc_encoder_ctl_get_in_dtx': 'p',
+    '_oc_create_decoder': 'q',
+    '_oc_destroy_decoder': 'r',
+    '_oc_decode': 's',
+    '_oc_decode_float': 't',
+    '_oc_decoder_ctl': 'B',
+    '_oc_global_create': 'L',
+    '_oc_global_free': 'M',
+    '_oc_strerror': 'N',
+    '_oc_get_version_string': 'O',
+    '_malloc': 'P',
+    '_free': 'Q',
+}
+WASM_INIT_EXPORT = 'h'
+WASM_MEMORY_EXPORT = 'g'
 
 Application = JSObject({
     'Voip': 2048,
@@ -124,8 +151,63 @@ def isOpusError(error):
     )
 
 
+class _WasmHeap:
+    def __init__(self, module, typecode):
+        self.module = module
+        self.typecode = typecode
+        self.size = array(typecode).itemsize
+
+    def __getitem__(self, key):
+        core = self.module.core
+        if isinstance(key, slice):
+            start = 0 if key.start is None else key.start
+            stop = start if key.stop is None else key.stop
+            values = array(self.typecode)
+            values.frombytes(core.memRead(start * self.size, max(0, stop - start) * self.size))
+            return values
+        return array(self.typecode, core.memRead(key * self.size, self.size))[0]
+
+    def __setitem__(self, key, value):
+        start = 0 if key.start is None else key.start
+        data = array(self.typecode, value).tobytes()
+        self.module.core.memWrite(start * self.size, data)
+
+
+class WasmLibopusModule:
+    def __init__(self, path=WASM_PATH):
+        from baileys.wasm.libopus_core import LibopusCore
+        self.core = LibopusCore(path, WASM_EXPORT_NAMES, WASM_INIT_EXPORT, WASM_MEMORY_EXPORT)
+        self.HEAPU8 = _WasmHeap(self, 'B')
+        self.HEAP16 = _WasmHeap(self, 'h')
+        self.HEAP32 = _WasmHeap(self, 'i')
+        self.HEAPF32 = _WasmHeap(self, 'f')
+
+    def __getattr__(self, name):
+        if name.startswith('__') or name not in WASM_EXPORT_NAMES:
+            raise AttributeError(name)
+        core = self.core
+
+        def invoke(*args):
+            return core.call(name, *args)
+
+        return invoke
+
+    def UTF8ToString(self, address):
+        if not address:
+            return ''
+        out = bytearray()
+        while True:
+            chunk = self.core.memRead(address + len(out), 64)
+            nul = chunk.find(b'\x00')
+            if nul >= 0:
+                out += chunk[:nul]
+                break
+            out += chunk
+        return out.decode('utf-8', 'replace')
+
+
 async def createAudioModule():
-    raise JSError('libopus WASM core is not available in the pure-Python port')
+    return await asyncio.to_thread(WasmLibopusModule, WASM_PATH)
 
 
 async def getModule():

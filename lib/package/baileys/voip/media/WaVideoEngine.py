@@ -166,15 +166,22 @@ class WaVideoEngine:
         }))
         stderrBox = ['']
 
+        loop = self.eventLoop()
+
+        def postToLoop(callback, *args):
+            try:
+                loop.call_soon_threadsafe(callback, *args)
+            except RuntimeError:
+                return False
+            return True
+
         def readOut():
             while True:
                 chunk = os.read(proc.stdout.fileno(), 65536)
                 if not chunk:
                     return
-                try:
-                    self.onData(chunk)
-                except Exception as err:
-                    self.logger.get('error')('video stream parse error', JSObject({'message': toError(err).message}))
+                if not postToLoop(self.handleChunk, chunk):
+                    return
 
         def readErr():
             while True:
@@ -190,30 +197,7 @@ class WaVideoEngine:
             code = proc.wait()
             outThread.join()
             errThread.join()
-            if self.proc is proc:
-                self.proc = None
-            self.running = False
-            if code > 0:
-                self.logger.get('error')('ffmpeg video process exited unexpectedly', JSObject({'code': code, 'stderr': stderrBox[0].strip()}))
-            if not self._deliberateStop and self.sourceKind:
-                nowMs = now()
-                if not self._restartWindowStartedAt or nowMs - self._restartWindowStartedAt > 60000:
-                    self._restartWindowStartedAt = nowMs
-                    self._restartCount = 0
-                self._restartCount = (0 if self._restartCount is None else self._restartCount) + 1
-                if self._restartCount > 5:
-                    self.logger.get('error')('video encoder crash-looped, giving up on auto-restart', JSObject({
-                        'source': self.sourceKind,
-                        'videoPath': self.videoPath,
-                        'restartCount': self._restartCount
-                    }))
-                    return
-                self.logger.get('error')('restarting video encoder after unexpected exit', JSObject({
-                    'source': self.sourceKind,
-                    'videoPath': self.videoPath,
-                    'restartCount': self._restartCount
-                }))
-                self.start()
+            postToLoop(self.handleProcessExit, proc, code, stderrBox)
 
         outThread.start()
         errThread.start()
@@ -225,6 +209,44 @@ class WaVideoEngine:
             'height': self.height,
             'fps': self.frameRate
         }))
+
+    def eventLoop(self):
+        try:
+            return asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.get_event_loop()
+
+    def handleChunk(self, chunk):
+        try:
+            self.onData(chunk)
+        except Exception as err:
+            self.logger.get('error')('video stream parse error', JSObject({'message': toError(err).message}))
+
+    def handleProcessExit(self, proc, code, stderrBox):
+        if self.proc is proc:
+            self.proc = None
+        self.running = False
+        if code > 0:
+            self.logger.get('error')('ffmpeg video process exited unexpectedly', JSObject({'code': code, 'stderr': stderrBox[0].strip()}))
+        if not self._deliberateStop and self.sourceKind:
+            nowMs = now()
+            if not self._restartWindowStartedAt or nowMs - self._restartWindowStartedAt > 60000:
+                self._restartWindowStartedAt = nowMs
+                self._restartCount = 0
+            self._restartCount = (0 if self._restartCount is None else self._restartCount) + 1
+            if self._restartCount > 5:
+                self.logger.get('error')('video encoder crash-looped, giving up on auto-restart', JSObject({
+                    'source': self.sourceKind,
+                    'videoPath': self.videoPath,
+                    'restartCount': self._restartCount
+                }))
+                return
+            self.logger.get('error')('restarting video encoder after unexpected exit', JSObject({
+                'source': self.sourceKind,
+                'videoPath': self.videoPath,
+                'restartCount': self._restartCount
+            }))
+            self.start()
 
     def onData(self, chunk):
         merged = self.pending + bytes(chunk)

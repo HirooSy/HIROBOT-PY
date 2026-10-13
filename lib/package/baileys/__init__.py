@@ -1,3 +1,9 @@
+import os as _os
+import sys as _sys
+
+if not _sys.pycache_prefix and not _os.environ.get('PYTHONPYCACHEPREFIX'):
+    _sys.pycache_prefix = _os.path.normpath(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..', '..', 'data', 'python', 'cache'))
+
 from baileys.foundation.node_runtime import JSObject
 from baileys.defaults import DEFAULT_CONNECTION_CONFIG
 from baileys.socket.business_communities import makeCommunitiesSocket

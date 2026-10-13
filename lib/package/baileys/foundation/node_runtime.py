@@ -19,6 +19,13 @@ class JSObject(dict):
             return self.__missing__(key)
         return default
 
+    def __getattr__(self, key):
+        if key.startswith('__'):
+            raise AttributeError(key)
+        if dict.__contains__(self, key):
+            return dict.__getitem__(self, key)
+        raise AttributeError(f"'JSObject' object has no attribute '{key}'")
+
 
 class JSError(Exception):
     def __init__(self, message='', **props):

@@ -9,7 +9,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 os.chdir(ROOT)
-sys.pycache_prefix = os.path.join(ROOT, 'data', 'pycache')
+sys.pycache_prefix = os.path.join(ROOT, 'data', 'python', 'cache')
 
 from lib.config import load_env_file
 
@@ -38,7 +38,7 @@ def clear_console():
 
 def child_env():
     env = dict(os.environ)
-    env['PYTHONPYCACHEPREFIX'] = os.path.join(ROOT, 'data', 'pycache')
+    env['PYTHONPYCACHEPREFIX'] = os.path.join(ROOT, 'data', 'python', 'cache')
     env['PYTHONPATH'] = ROOT + os.pathsep + os.path.join(ROOT, 'lib', 'package')
     return env
 
