@@ -42,7 +42,7 @@ def load_env_file(path):
 
 load_env_file(os.path.join(os.getcwd(), '.env'))
 
-from baileys_lite import Browsers
+from baileys import Browsers
 from lib.utils.handler import G
 
 

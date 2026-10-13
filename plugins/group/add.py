@@ -2,8 +2,8 @@ import asyncio
 import re
 import sys
 
-from baileys_lite import getBinaryNodeChild, getBinaryNodeChildren
-from baileys_lite.foundation.node_runtime import JSObject
+from baileys import getBinaryNodeChild, getBinaryNodeChildren
+from baileys.foundation.node_runtime import JSObject
 from lib.compat import http
 from lib.utils.handler import G, PluginError
 from lib.utils.helper import maybe_await, oc, Silent

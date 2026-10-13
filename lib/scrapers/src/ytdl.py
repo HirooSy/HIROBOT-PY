@@ -5,7 +5,7 @@ import re
 import sys
 from urllib.parse import quote
 
-from baileys_lite.foundation.node_crypto import createDecipheriv
+from baileys.foundation.node_crypto import createDecipheriv
 from lib.compat import http
 from lib.scrapers.src import ytsearch
 

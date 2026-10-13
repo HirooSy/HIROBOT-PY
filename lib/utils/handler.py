@@ -31,7 +31,7 @@ else:
     G = _Global()
 
 
-from baileys_lite import areJidsSameUser, generateWAMessageFromContent, getContentType, proto
+from baileys import areJidsSameUser, generateWAMessageFromContent, getContentType, proto
 from lib.utils import helper
 from lib.utils.color import chalk
 from lib.utils.helper import format_error, maybe_await, oc, Silent, spawn, to_number

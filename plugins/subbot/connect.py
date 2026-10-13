@@ -6,11 +6,11 @@ import re
 import sys
 import time
 
-from baileys_lite import (
+from baileys import (
     areJidsSameUser, DisconnectReason, fetchLatestBaileysVersion, generateQR,
     makeCacheableSignalKeyStore, makeWASocket,
 )
-from baileys_lite.foundation.node_runtime import JSObject
+from baileys.foundation.node_runtime import JSObject
 from lib.utils import connection as Connection, database as dbmod, helper
 from lib.utils.handler import G, PluginError
 from lib.utils.helper import maybe_await, oc, spawn

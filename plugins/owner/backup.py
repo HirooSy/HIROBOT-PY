@@ -9,7 +9,7 @@ from lib.utils import converter
 
 GIT_TIMEOUT = 180
 EXCLUDED = ['node_modules', 'package-lock.json', 'yarn.lock', 'data/store.json', 'data/ai/backups', 'data/reminder.json', 'data/tunnel',
-            'data/tmp', '.cache', '.npm', '.agents', '.config', 'data/sessions/store.db']
+            'data/tmp', '.cache', '.npm', '.agents', '.config', 'data/sessions/store.db', 'data/pycache']
 
 
 def dir_size(d):

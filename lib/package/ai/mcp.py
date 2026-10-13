@@ -2473,7 +2473,7 @@ async def download_twitter_direct(query):
 
 
 async def download_user_image_as_url(m):
-    from baileys_lite import downloadMediaMessage
+    from baileys import downloadMediaMessage
     from lib.scrapers.src.upload import upload
     msg_types = ['imageMessage', 'stickerMessage']
     message = _obj_get(m, 'message') or {}
@@ -3811,7 +3811,7 @@ def _iso_now():
 CODE_CONVENTIONS = '\n'.join([
     'CODE STRUCTURE CONVENTIONS OF THIS PROJECT (MANDATORY, do not deviate):',
     '- Language: Python 3.10+ with asyncio (async def / await). Standard library only. Never import third-party packages (no aiohttp, requests, PIL, numpy, cryptography, bs4, etc.) and never npm/Node packages.',
-    "- Imports go at the top of the file. Allowed: the standard library, project modules that already exist (e.g. 'from lib.utils.handler import G, PluginError', 'from lib.utils import helper', 'from lib.utils.helper import spawn', 'from lib.utils import plugins as plugmod'), and 'from baileys_lite import ...' (the Python port of the WhatsApp library, lib/package/baileys_lite). Never invent a module path; check that it exists first.",
+    "- Imports go at the top of the file. Allowed: the standard library, project modules that already exist (e.g. 'from lib.utils.handler import G, PluginError', 'from lib.utils import helper', 'from lib.utils.helper import spawn', 'from lib.utils import plugins as plugmod'), and 'from baileys import ...' (the Python port of the WhatsApp library, lib/package/baileys). Never invent a module path; check that it exists first.",
     '- Plugin files are Python modules at plugins/<folder>/<name>.py. The loader skips files starting with underscore and __init__.py. A plugin has an async handler plus module-level meta names. There is NO JS-style handler object: the meta names are plain module variables.',
     '  async def handler(m, *, conn, text, usedPrefix, command):',
     '  (m = the message: m.chat, m.sender, m.reply(...), m.react(...). Declare as keyword-only parameters only the context values the function reads, and nothing else. Available: conn, command, args, text, usedPrefix, noPrefix, match, user, bot, participants, groupMetadata, isOwner, isROwner, isAdmin, isRAdmin, isBotAdmin, isPrems. conn is the WhatsApp connection.)',
@@ -4026,7 +4026,7 @@ async def with_timeout(aw, ms, label):
 
 async def build_media_part(m, context_override=None):
     try:
-        from baileys_lite import downloadMediaMessage
+        from baileys import downloadMediaMessage
         msg_types = ['imageMessage', 'audioMessage', 'videoMessage', 'documentMessage', 'stickerMessage']
         message = _obj_get(m, 'message') or {}
         msg_type = next((t for t in message if t in msg_types), None)

@@ -5,7 +5,7 @@ import sys
 import time
 from datetime import datetime, timezone
 
-from baileys_lite import getBinaryNodeChild, getBinaryNodeChildren, S_WHATSAPP_NET
+from baileys import getBinaryNodeChild, getBinaryNodeChildren, S_WHATSAPP_NET
 from lib.utils.helper import oc
 from lib.utils.handler import PluginError
 

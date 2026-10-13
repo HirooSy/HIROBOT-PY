@@ -667,7 +667,7 @@ helper.refresh()
 G.opts = helper.runtime_opts
 G.prefix = helper.prefix_list
 
-BAILEYS_STACK_MARKERS = ('/baileys/', '@whiskeysockets/baileys', 'undici', '/baileys-lite/', '/baileys_lite/')
+BAILEYS_STACK_MARKERS = ('/baileys/', '@whiskeysockets/baileys', 'undici', '/baileys/', '/baileys/')
 IGNORED_ERROR_WINDOW_S = 120
 IGNORED_ERROR_THRESHOLD = 10
 FORCE_RECONNECT_DEBOUNCE_S = 5

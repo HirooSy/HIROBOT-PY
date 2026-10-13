@@ -10,7 +10,7 @@ from lib.utils.handler import G
 
 
 LIB_DIR = os.path.join(helper.ROOT, 'lib')
-EXCLUDED = {'__pycache__', '.git', 'data', '.cache', 'baileys_lite'}
+EXCLUDED = {'__pycache__', '.git', 'data', '.cache', 'baileys'}
 SKIP_LIB_FILES = {'start.py'}
 POLL_SECONDS = 1.0
 started = False

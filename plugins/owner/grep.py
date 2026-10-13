@@ -8,7 +8,7 @@ async def handler(m, *, text):
     if not text:
         raise PluginError('Keyword?')
     proc = await asyncio.create_subprocess_exec(
-        'grep', '-rn', text, '--include=*.py', '--exclude-dir=__pycache__', '--exclude-dir=sessions', '--exclude-dir=baileys_lite', './',
+        'grep', '-rn', text, '--include=*.py', '--exclude-dir=__pycache__', '--exclude-dir=sessions', '--exclude-dir=baileys', './',
         stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
     out, err = await proc.communicate()
     out, err = out.decode('utf-8', 'replace'), err.decode('utf-8', 'replace')

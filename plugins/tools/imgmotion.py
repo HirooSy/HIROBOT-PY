@@ -2,7 +2,7 @@ import asyncio
 import re
 import sys
 
-from baileys_lite import generateWAMessageFromContent, prepareWAMessageMedia
+from baileys import generateWAMessageFromContent, prepareWAMessageMedia
 from lib.compat import http
 from lib.utils.helper import oc
 

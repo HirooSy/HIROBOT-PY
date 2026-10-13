@@ -12,19 +12,19 @@ import traceback
 import types
 from types import SimpleNamespace
 
-from baileys_lite.foundation.node_runtime import JSObject
-from baileys_lite.foundation.qrcode_terminal import _QRCode, _QRErrorCorrectLevel
-from baileys_lite.utils.auth_state_storage import bufferJsonParse, bufferJsonStringify
+from baileys.foundation.node_runtime import JSObject
+from baileys.foundation.qrcode_terminal import _QRCode, _QRErrorCorrectLevel
+from baileys.utils.auth_state_storage import bufferJsonParse, bufferJsonStringify
 from lib.utils import database as dbmod, helper
 from lib.utils.color import chalk
 from lib.utils.handler import G
 from lib.utils.helper import KeyedLock, maybe_await, now_ms, oc, spawn, truthy
 from lib.utils.simple import _Lazy, helper_connection
-from baileys_lite import (
+from baileys import (
     DisconnectReason, createLogger, fetchLatestBaileysVersion, generateQR, initAuthCreds,
     makeCacheableSignalKeyStore, makeWASocket, useMultiFileAuthState,
 )
-from baileys_lite import (
+from baileys import (
     WAMessageStubType, decryptPollVote, getKeyAuthor, isJidBroadcast, isJidGroup, jidDecode,
     jidNormalizedUser, proto, updateMessageWithReaction, updateMessageWithReceipt,
 )

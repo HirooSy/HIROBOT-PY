@@ -1,7 +1,7 @@
 import asyncio
 import re
 
-from baileys_lite import downloadMediaMessage, S_WHATSAPP_NET
+from baileys import downloadMediaMessage, S_WHATSAPP_NET
 from lib.utils.canvas import jimp
 from lib.utils.handler import G, PluginError
 from lib.utils.helper import spawn

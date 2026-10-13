@@ -4,7 +4,7 @@ import sys
 import tempfile
 import time
 
-from baileys_lite.voip import Voip
+from baileys.voip import Voip
 from lib.utils.helper import spawn
 from lib.utils.handler import PluginError
 

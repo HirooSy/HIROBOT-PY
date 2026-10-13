@@ -14,13 +14,13 @@ import time
 import uuid
 from urllib.parse import quote
 
-from baileys_lite.foundation.node_crypto import createCipheriv
+from baileys.foundation.node_crypto import createCipheriv
 from lib.compat import ffmpeg as ff, http
 from lib.utils import converter, database as dbmod
 from lib.utils.canvas import add_exif, is_animated_webp, is_webp, jimp, to_webp
 from lib.utils.handler import G
 from lib.utils.helper import file_type_from_buffer, maybe_await, oc, spawn, to_simple_number
-from baileys_lite import (
+from baileys import (
     S_WHATSAPP_NET, USyncQuery, USyncUser, areJidsSameUser, downloadContentFromMessage,
     extractMessageContent, generateForwardMessageContent, generateMessageIDV2,
     generateWAMessageFromContent, getContentType, jidDecode, jidNormalizedUser,

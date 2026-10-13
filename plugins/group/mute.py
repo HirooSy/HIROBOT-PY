@@ -2,7 +2,7 @@ import asyncio
 import re
 import sys
 
-from baileys_lite.foundation.node_runtime import JSObject
+from baileys.foundation.node_runtime import JSObject
 from lib.utils import connection as Connection
 from lib.utils.handler import G
 from lib.utils.helper import oc, sleep

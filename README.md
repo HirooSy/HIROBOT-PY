@@ -35,7 +35,7 @@ HIROBOT
 │   ├── 📁compat
 │   ├── 📁package
 │   │   ├── 📁ai
-│   │   ├── 📁baileys_lite
+│   │   ├── 📁baileys
 │   │   └── 📁website
 │   ├── 📁scrapers
 │   ├── 📁utils
@@ -612,7 +612,7 @@ await conn.sendStickerPack(m.chat, {
 # URL — 'https://example.com/audio.mp3'
 # Local — '/path/to/video.mp4'
 # Support Array — [ url, path ]
-from baileys_lite.voip import Voip
+from baileys.voip import Voip
 
 voip = Voip(conn, {'voipLogLevel': 'info'})
 

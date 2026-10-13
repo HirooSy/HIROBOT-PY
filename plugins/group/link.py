@@ -1,6 +1,6 @@
 import re
 
-from baileys_lite import areJidsSameUser
+from baileys import areJidsSameUser
 from lib.utils.handler import PluginError
 from lib.utils.simple import _get
 

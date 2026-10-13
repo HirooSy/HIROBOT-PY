@@ -1,7 +1,7 @@
 import json
 import re
 
-from baileys_lite import proto
+from baileys import proto
 from lib.utils.handler import G, PluginError
 
 

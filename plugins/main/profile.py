@@ -1,6 +1,6 @@
 import math
 
-from baileys_lite import getDevice
+from baileys import getDevice
 from lib.compat import http
 from lib.utils.canvas import Canvas, jimp, rounded_poly
 from lib.utils.handler import G

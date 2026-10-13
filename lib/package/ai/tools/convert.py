@@ -190,7 +190,7 @@ async def _get_attached_media():
     if m is None:
         return None
     try:
-        from baileys_lite import downloadMediaMessage
+        from baileys import downloadMediaMessage
         types = ['documentMessage', 'imageMessage', 'videoMessage', 'audioMessage', 'stickerMessage']
         message = _g(m, 'message') or {}
         direct = next((t for t in message if t in types), None)
