@@ -506,27 +506,35 @@ async def _gr_start_session(retries=3):
             await asyncio.sleep(1 * attempt)
 
 
-async def _gr_upload_image(image_buffer, mime_type, auth):
+GR_UPLOAD_ENDPOINT = 'https://content-push.googleapis.com/upload'
+GR_DEFAULT_PUSH_ID = 'feeds/mcudyrk2a4khkz'
+_GR_MIME_EXT = {'image/jpeg': '.jpg', 'image/jpg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif'}
+
+
+def _gr_file_name(mime_type):
+    ext = _GR_MIME_EXT.get((mime_type or '').lower(), '.jpg')
+    return f'input_{random.randint(1000000, 9999999)}{ext}'
+
+
+async def _gr_upload_file(buffer, mime_type, auth):
+    mime_type = mime_type or 'image/jpeg'
+    filename = _gr_file_name(mime_type)
     boundary = '----GeminiUpload' + uuid.uuid4().hex
-    meta_json = json.dumps({'mimeType': mime_type}, separators=(',', ':'), ensure_ascii=False)
-    body = (f'--{boundary}\r\nContent-Type: application/json\r\n\r\n{meta_json}\r\n'.encode('utf-8')
-            + f'--{boundary}\r\nContent-Type: {mime_type}\r\n\r\n'.encode('utf-8')
-            + bytes(image_buffer)
-            + f'\r\n--{boundary}--\r\n'.encode('utf-8'))
-    res = await asyncio.to_thread(
-        _gr_http_full_sync,
-        'https://gemini.google.com/_/BardChatUi/data/batchexecute?rpcids=hEoONb&source-path=%2F&hl=en-US&rt=c',
-        'POST',
-        {
-            'content-type': f'multipart/form-data; boundary={boundary}',
-            'cookie': _build_cookie_str(auth['cookies']),
-            'origin': 'https://gemini.google.com',
-            'referer': 'https://gemini.google.com/',
-        },
-        body,
-    )
-    m = re.search(r'"(https://gemini\.google\.com/[^"]+)"', res.text)
-    return m.group(1) if m else None
+    body = (f'--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="{filename}"\r\n'
+            f'Content-Type: {mime_type}\r\n\r\n').encode('utf-8') + bytes(buffer) + f'\r\n--{boundary}--\r\n'.encode('utf-8')
+    headers = {
+        'content-type': f'multipart/form-data; boundary={boundary}',
+        'origin': 'https://gemini.google.com',
+        'referer': 'https://gemini.google.com/',
+        'x-tenant-id': 'bard-storage',
+        'push-id': GR_DEFAULT_PUSH_ID,
+        'cookie': _build_cookie_str(auth['cookies']),
+    }
+    res = await asyncio.to_thread(_gr_http_full_sync, GR_UPLOAD_ENDPOINT, 'POST', headers, body)
+    uploaded = (res.text or '').strip()
+    if res.status != 200 or not uploaded:
+        raise Exception(f'GeminiGuest upload failed: {res.status}')
+    return uploaded, filename
 
 
 def _gr_build_payload(prompt_part, language, metadata):
@@ -572,8 +580,12 @@ async def _gr_stream_once(prompt, auth, chat_metadata, on_chunk, image_buffers=N
     auth['reqId'] = (auth.get('reqId') or 10000) + 100000
     metadata = list(chat_metadata) if chat_metadata else ['', '', '', None, None, None, None, None, None, '']
     language = auth.get('language') or 'en-US'
-    if image_buffers:
-        prompt_part = [prompt, 0, None, [{'imageData': {'data': base64.b64encode(bytes(ib['buffer'])).decode('ascii'), 'mimeType': ib['mimeType']}} for ib in image_buffers], None, None, 0]
+    file_refs = []
+    for ib in (image_buffers or []):
+        url, name = await _gr_upload_file(ib['buffer'], ib.get('mimeType'), auth)
+        file_refs.append([[url], name])
+    if file_refs:
+        prompt_part = [prompt, 0, None, file_refs, None, None, 0]
     else:
         prompt_part = [prompt, 0, None, None, None, None, 0]
     payload = _gr_build_payload(prompt_part, language, metadata)
@@ -3126,7 +3138,8 @@ def is_downstream_api_error(err):
     http_status = re.search(r'\b(500|502|503|504)\b|Internal Server Error|Bad Gateway|Service Unavailable|Gateway Timeout', msg, re.I)
     parse = re.search(r'Unexpected token .* in JSON|is not valid JSON|Unexpected end of JSON input', msg, re.I)
     scraper = re.search(r'Scrape trouble|download error|Failed to initiate download|Download failed|No download URL found|Download timed out|API Error:', msg, re.I)
-    return bool(network or http_status or parse or scraper)
+    guest_rejected = re.search(r'GeminiGuest (?:generate|upload) failed: 4\d\d|GeminiGuest API error', msg, re.I)
+    return bool(network or http_status or parse or scraper or guest_rejected)
 
 
 def is_intentional_usage_error(err):
