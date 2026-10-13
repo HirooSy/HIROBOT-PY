@@ -1,7 +1,7 @@
 <div align=center>
-<a href="#"><img src="https://files.catbox.moe/bisfzj.png"/></a> 
+<a href="#"><img src="https://files.catbox.moe/p98vc9.png"/></a> 
 
-  <a href="https://github.com/whiskeysockets/baileys"><img height="22" src="https://img.shields.io/badge/Baileys-000000?style=for-the-badge&logo=whatsapp&logoColor=green"/></a><a href="#"><img height="22" src="https://img.shields.io/badge/Python-000000.svg?&style=for-the-badge&logo=python&logoColor=yellow"/></a><a href="https://gemini.google.com"><img height="22" src="https://img.shields.io/badge/Gemini-000000?style=for-the-badge&logo=googlegemini&logoColor=blue"/></a><a href="https://cloudflare.com"><img height="22" src="https://img.shields.io/badge/Cloudflare-000000?style=for-the-badge&logo=Cloudflare&logoColor=orange"/></a>
+  <a href="https://github.com/whiskeysockets/baileys"><img height="22" src="https://img.shields.io/badge/Baileys-000000?style=for-the-badge&logo=whatsapp&logoColor=green"/></a><a href="#"><img height="22" src="https://img.shields.io/badge/Python-000000.svg?&style=for-the-badge&logo=python&logoColor=white"/></a><a href="https://gemini.google.com"><img height="22" src="https://img.shields.io/badge/Gemini-000000?style=for-the-badge&logo=googlegemini&logoColor=blue"/></a><a href="https://cloudflare.com"><img height="22" src="https://img.shields.io/badge/Cloudflare-000000?style=for-the-badge&logo=Cloudflare&logoColor=orange"/></a>
 </div>
 
 > [!IMPORTANT]

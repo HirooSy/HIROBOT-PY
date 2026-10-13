@@ -162,6 +162,8 @@ SRGB_TO_LIN = [((i / 255) / 12.92 if i / 255 <= 0.04045 else (((i / 255) + 0.055
 REGISTERED_FONTS = {}
 FONT_CACHE = {}
 DEFAULT_FONT = {'obj': None}
+DEFAULT_FONT_URL = 'https://github.com/HirooSy/HirooSy/raw/refs/heads/main/arial.ttf'
+FONT_SIGNATURES = (b'\x00\x01\x00\x00', b'OTTO', b'true', b'ttcf')
 
 
 def clamp255(v):
@@ -1601,6 +1603,22 @@ class TTFont:
 
 def default_font_path():
     return os.path.join(os.getcwd(), 'data', 'brat-arial.ttf')
+
+
+async def ensure_default_font():
+    if DEFAULT_FONT['obj'] is not None:
+        return DEFAULT_FONT['obj']
+    path = default_font_path()
+    if not os.path.isfile(path):
+        res = await http.get(DEFAULT_FONT_URL, timeout=20, raise_for_status=False)
+        data = res.content if res.ok else None
+        if not data or len(data) < 10000 or bytes(data[:4]) not in FONT_SIGNATURES:
+            raise RuntimeError(f'Font default tidak ada di {path} dan gagal diunduh')
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'wb') as fh:
+            fh.write(data)
+    DEFAULT_FONT['obj'] = load_font_file(path)
+    return DEFAULT_FONT['obj']
 
 
 def load_font_file(path):

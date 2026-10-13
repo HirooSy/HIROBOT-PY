@@ -2,7 +2,7 @@ import math
 
 from baileys import getDevice
 from lib.compat import http
-from lib.utils.canvas import Canvas, jimp, rounded_poly
+from lib.utils.canvas import Canvas, ensure_default_font, jimp, rounded_poly
 from lib.utils.handler import G
 
 
@@ -108,6 +108,7 @@ async def get_avatar(url):
 
 
 async def render_card(name, avatar, badges):
+    await ensure_default_font()
     cv = Canvas(SIZE, SIZE, BG)
     cv.rect(0, CARD_Y, PANEL_X, CARD_H, '#1b1d2b')
     if avatar:
