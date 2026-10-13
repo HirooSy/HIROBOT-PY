@@ -1,5 +1,5 @@
 <div align=center>
-<a href="#"><img src="https://files.catbox.moe/tl36qw.png"/></a> 
+<a href="#"><img src="https://files.catbox.moe/bisfzj.png"/></a> 
 
   <a href="https://github.com/whiskeysockets/baileys"><img height="22" src="https://img.shields.io/badge/Baileys-000000?style=for-the-badge&logo=whatsapp&logoColor=green"/></a><a href="#"><img height="22" src="https://img.shields.io/badge/Python-000000.svg?&style=for-the-badge&logo=python&logoColor=yellow"/></a><a href="https://gemini.google.com"><img height="22" src="https://img.shields.io/badge/Gemini-000000?style=for-the-badge&logo=googlegemini&logoColor=blue"/></a><a href="https://cloudflare.com"><img height="22" src="https://img.shields.io/badge/Cloudflare-000000?style=for-the-badge&logo=Cloudflare&logoColor=orange"/></a>
 </div>
@@ -8,7 +8,7 @@
 > Please read the [<code>LICENSE</code>](https://github.com/HirooSy/HIROBOT/blob/main/LICENSE) before using this project! You're free to recode it, but do not sell or claim this project as your own. <b>Do not change the License.</b> if you modify it, <b>please credit me in your License.</b>
 
 > [!NOTE]
-> High-performance WhatsApp bot with AI agent, VoIP calling capabilities, and a website feature. Built with a Python port of Baileys (`baileys_lite`) and Python 3.10+, using only the standard library (no pip packages).
+> High-performance WhatsApp bot with AI agent, VoIP calling capabilities, and a website feature. Built with a Python Baileys and Python 3.10+.
 > 
 > ---
 > 
@@ -32,13 +32,13 @@
          ---Project Structure---
 HIROBOT
 ├── 📁lib
-│   ├── 📁compat             # Node replacements (http, html, ffmpeg)
+│   ├── 📁compat
 │   ├── 📁package
-│   │   ├── 📁ai             # AI agent & tools
-│   │   ├── 📁baileys_lite   # Baileys (Python port)
-│   │   └── 📁website        # web server
+│   │   ├── 📁ai
+│   │   ├── 📁baileys_lite
+│   │   └── 📁website
 │   ├── 📁scrapers
-│   ├── 📁utils              # handler, connection, database, store, ...
+│   ├── 📁utils
 │   ├── 📄config.py          # bot's preference
 │   ├── 📄main.py            # bot process
 │   └── 📄start.py           # supervisor (run this)
@@ -46,7 +46,7 @@ HIROBOT
 │   ├── 📁sessions
 │   ├── 📁tunnel
 │   └── 📁tmp
-├── 📁plugins                # one file per command
+├── 📁plugins
 ├── 📄.env                   # your tokens
 ├── 📄.env.example
 ├── 📄LICENSE
@@ -56,8 +56,6 @@ HIROBOT
 
   </td>
 </table>
-
-<div align=center><a href="https://github.com/HirooSy/HIROBOT/discussions"><img height="20" src="https://img.shields.io/badge/Discussion-ffffff.svg?&style=for-the-badge&logo=livechat&logoColor=black"/></a></div><br>
 
 
 <details> 
@@ -105,33 +103,6 @@ HIROBOT
 </table>
 
 <h4 align=center>How to add a new tool</h4>
-
-Each tool file lives in `lib/package/ai/tools/` and exposes a `default` list. Every entry needs a `name`, a `description`, `parameters`, and an async `execute(args)`. Tool files import helpers from `lib.package.ai.mcp`, and the file is loaded at runtime, so there is no circular-import issue.
-
-```python
-from lib.package.ai import mcp
-
-
-async def _exec_check_weather(args=None, **kw):
-    a = {**(args or {}), **kw}
-    ctx = mcp.ctx()
-    if not ctx.get('currentJid'):
-        return 'Chat context not available'
-    city = str(a.get('city'))
-    return f'Weather in {city}: sunny, 30°C'
-
-
-default = [
-    {
-        'name': 'check_weather',
-        'description': 'Check the weather for a specific city. Use it when a user asks for the weather, e.g., "What\'s the weather like in Jakarta?"',
-        'parameters': {
-            'city': {'type': 'string', 'description': 'City name, e.g. "Jakarta"', 'required': True},
-        },
-        'execute': _exec_check_weather,
-    },
-]
-```
 
 <details>
   <summary align=center><sub>All MCP Helper</sub></summary>
@@ -262,20 +233,33 @@ default = [
 </details>
 
 <sub>
-  
+
 ```python
 from lib.package.ai import mcp
 
-ctx = mcp.ctx()
-```
 
-`ctx()` returns the current chat state (always fresh, backed by an internal module-level object in `mcp.py`). Common keys:
-- `currentJid`: the id of the chat/user sending the message
-- `conn`: the active WhatsApp connection (for manual sends)
-- `isOwner`: `True` if the sender is the bot owner
-- `isROwner`: `True` if the sender is a "real" owner (not fromMe)
-- `timezone`: sender's configured timezone, e.g. `"Asia/Jakarta"`
+async def _exec_check_weather(args=None, **kw):
+    a = {**(args or {}), **kw}
+    ctx = mcp.ctx()
+    if not ctx.get('currentJid'):
+        return 'Chat context not available'
+    city = str(a.get('city'))
+    return f'Weather in {city}: sunny, 30°C'
+
+
+default = [
+    {
+        'name': 'check_weather',
+        'description': 'Check the weather for a specific city. Use it when a user asks for the weather, e.g., "What\'s the weather like in Jakarta?"',
+        'parameters': {
+            'city': {'type': 'string', 'description': 'City name, e.g. "Jakarta"', 'required': True},
+        },
+        'execute': _exec_check_weather,
+    },
+]
+```
 </sub>
+
 </details>
 
 <details>
@@ -361,17 +345,24 @@ ctx = mcp.ctx()
 ```python
 await conn.reply(m.chat, 'Hello world!', m)
 
+# @Media
+# URL — 'https://example.com/audio.mp3'
+# Local — '/path/to/video.mp4'
+#
+# @Options
+# send as document — options={'asDocument': True}
+# send as voicenote — ptt=True (the sixth argument, right after m)
 await conn.sendFile(m.chat, media, 'file.png', 'hello world!', m, options={'asDocument': True})
+await conn.sendFile(m.chat, media, 'voice.mp3', '', m, True)
 
 await conn.sendContact(m.chat, [
     ['6281234567890', 'HirooSy'],
     ['6289876543210', 'Hiro'],
 ], m)
 
+# react is synchronous, do not await it
 conn.react(m.chat, '👍', m.key)
 ```
-
-Media can be a URL (`'https://example.com/audio.mp3'`) or a local path (`'/path/to/video.mp4'`). Options: `options={'asDocument': True}` sends as a document, and `ptt=True` (the sixth argument after `conn` is `ptt`) sends as a voicenote: `await conn.sendFile(m.chat, media, 'voice.mp3', '', m, True)`. `react` is synchronous, so do not `await` it.
 </sub></details>
 
 <details> <summary>📍 Location</summary>
@@ -387,6 +378,9 @@ await conn.sendLocation(m.chat, 'https://example.com/thumb.jpg', 'Title', 'Addre
   <sub>
  
 ```python
+# @Media
+# String: "https://example.com/img.png" or "./image.png"
+# Array: [ "https://example.com/", "./img.png" ]
 await conn.sendProduct(m.chat, media, 'Title', 'Description', m, {
     'businessOwnerJid': '0@s.whatsapp.net',
     'currencyCode': 'USD',
@@ -394,8 +388,6 @@ await conn.sendProduct(m.chat, media, 'Title', 'Description', m, {
     'retailerId': 'Code Promo',
 })
 ```
-
-`media` can be a URL string, a local path, or a list of them.
 
 </sub></details>
 
@@ -409,7 +401,7 @@ await conn.sendUrlPreview(
     'https://example.com Hello World!',
     'Url Preview Title',
     'Url Description',
-    'IMAGE',
+    'IMAGE',   # True for highQuality, or ['IMAGE', True]
     m,
 )
 ```
@@ -483,33 +475,43 @@ await conn.sendButton(m.chat, {
     'footer': 'A2UI Showcase',
     'widget': {
         'align': 'center',
-        'fallback': 'Widget cannot be loaded on this device',
+        'fallback': 'Widget cannot be loaded on this device',  # optional
         'items': [
+            # --- TEXT ---
             {'text': 'Welcome to the Widget Demo', 'variant': 'title'},
             {'text': 'This is a longer description explaining what the widget contains.', 'variant': 'body'},
             {'text': 'Small caption', 'variant': 'caption'},
 
-            {'icon': 'info'},
-            {'icon': 'warning', 'style': 'symbol'},
-            {'icon': 'favorite', 'native': True},
+            # --- ICON ---
+            {'icon': 'info'},                              # -> '[i]'
+            {'icon': 'warning', 'style': 'symbol'},        # -> '!'
+            {'icon': 'favorite', 'native': True},          # uses native Icon component
 
+            # --- IMAGE ---
             {'image': 'https://example.com/banner.jpg', 'variant': 'header', 'fit': 'cover', 'description': 'Promo banner'},
 
+            # --- VIDEO ---
             {'video': 'https://example.com/preview.mp4'},
 
+            # --- AUDIO ---
             {'audio': 'https://example.com/audio.mp3', 'description': 'Listen to this audio'},
 
+            # --- DIVIDER ---
             {'divider': 'horizontal'},
             {'divider': 'vertical'},
 
+            # --- BUTTON ---
             {'button': 'Open Website', 'url': 'https://example.com', 'variant': 'primary'},
 
+            # --- TEXT INPUT ---
             {'input': 'name', 'label': 'Enter your name', 'value': '', 'variant': 'shortText'},
             {'input': 'message', 'label': 'Long message', 'variant': 'longText', 'value': ''},
             {'input': 'email', 'label': 'Email', 'variant': 'shortText', 'validationRegexp': r'^[^@]+@[^@]+\.[^@]+$'},
 
+            # --- CHECKBOX ---
             {'checkbox': 'I agree to the terms & conditions', 'value': False},
 
+            # --- CHOICE PICKER ---
             {
                 'choice': ['Red', 'Green', 'Blue'],
                 'label': 'Pick your favorite color',
@@ -528,14 +530,19 @@ await conn.sendButton(m.chat, {
                 'value': ['a', 'b'],
             },
 
+            # --- SLIDER ---
             {'slider': 100, 'min': 0, 'max': 100, 'value': 50, 'label': 'Volume'},
 
+            # --- DATETIME ---
             {'datetime': True, 'label': 'Pick a date', 'value': '', 'enableDate': True, 'enableTime': False},
 
+            # --- ROW (horizontal) ---
             {'row': [{'text': 'Left'}, {'text': 'Center'}, {'text': 'Right'}], 'justify': 'space-between', 'align': 'center'},
 
+            # --- COLUMN (vertical) ---
             {'column': [{'text': 'Row 1'}, {'text': 'Row 2'}, {'text': 'Row 3'}], 'justify': 'start', 'align': 'stretch'},
 
+            # --- LIST ---
             {'list': [{'text': '• First item'}, {'text': '• Second item'}, {'text': '• Third item'}], 'direction': 'vertical'},
         ],
     },
@@ -567,6 +574,7 @@ await (
     .send(m.chat, {'quoted': m})
 )
 
+# animated progress
 await conn.aiRich().addProcess('Loading...').send(m.chat)
 ```
 </sub></details>
@@ -575,32 +583,53 @@ await conn.aiRich().addProcess('Loading...').send(m.chat)
   <sub>
 
 ```python
+# @Media
+# URL — 'https://example.com/image.png'
+# Local — '/path/to/image.png'
+
+# Sticker
 await conn.sendSticker(m.chat, media, {'packname': 'Hiro', 'author': 'Bot'}, m)
+
+# StickerPack
+await conn.sendStickerPack(m.chat, {
+    'cover': {'url': media},
+    'stickers': [
+        {'data': {'url': media}},
+        {'data': {'url': media}},
+    ],
+    'name': 'My Sticker Pack',
+    'publisher': 'Publisher stickerpack',
+    'description': 'Description pack',
+})
 ```
-
-`media` can be a URL or a local path. Sticker packs are built with `conn.sendStickerPack` (see `lib/utils/simple.py` for the options).
-
 </sub></details>
 
 <details> <summary>📞 Call</summary>
   <sub>
 
 ```python
+# @Media
+# URL — 'https://example.com/audio.mp3'
+# Local — '/path/to/video.mp4'
+# Support Array — [ url, path ]
 from baileys_lite.voip import Voip
 
 voip = Voip(conn, {'voipLogLevel': 'info'})
 
 call = await voip.call(m.sender, media, '720p')
 
-await call.end()
+# hang up
+await call.hangup()
 
+# mute
+call.mute()
+
+# silent (mute mic and pause video)
 await call.silent()
 ```
-
-`media` can be a URL, a local path, or a list of them.
 </sub></details>
 </details>
-  
+
 <details>
    <summary><b>Install and Run</b></summary><br>
 
@@ -683,14 +712,6 @@ $ cd HIROBOT
 $ cp .env.example .env
 $ python lib/start.py
 ```
-
-Options:
-- `--pair <number>` pairing code login
-- `--prefix <chars>` (or `-p`) command prefix
-- `--self` self mode
-- `--queue` queue messages
-- `--autoread` auto read messages
-
 </sub>
 
 <div align=center>
